@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+	<!-- external -->
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<!-- local -->
+	<script src="utils.js"></script>
+
+	<script>
+		var weeklyChartUrlFormat = 'https://stockcharts.com/c-sc/sc?s={0}&p=W&st={1}&en={2}&i=p03109540830&r=1537814132519';
+		var dailyChartUrlFormat = 'https://stockcharts.com/c-sc/sc?s={0}&p=D&st={1}&en={2}&i=p06466849456&r=1537882904610';
+		var today = utils.dateToStr(new Date());
+
+		angular.module('elderTool', []).controller('twoScreenSystem', ['$scope', function($scope) {
+			$scope.symbol = 'AAPL';
+			$scope.toDate = today;
+			$scope.weeklyFromDate = utils.getAddedDays(today, -356);
+			$scope.dailyFromDate = utils.getAddedDays(today, -90);
+
+			$scope.weeklyChartUrl = '';
+			$scope.dailyChartUrl = '';
+
+			$scope.fieldKeyPress = function(event) {
+				if (event.keyCode == 13) {
+	 				$scope.render();
+	 			}
+			};
+
+			$scope.moveForDays = function(day) {
+				$scope.weeklyFromDate = utils.getAddedDays($scope.weeklyFromDate, day);
+				$scope.dailyFromDate = utils.getAddedDays($scope.dailyFromDate, day);
+				$scope.toDate = utils.getAddedDays($scope.toDate, day);
+				$scope.render();
+			};
+			$scope.render = function() {
+				$scope.weeklyChartUrl = weeklyChartUrlFormat.format($scope.symbol, $scope.weeklyFromDate, $scope.toDate);
+				$scope.dailyChartUrl = dailyChartUrlFormat.format($scope.symbol, $scope.dailyFromDate, $scope.toDate);
+			};
+		}]);
+	</script>
+
+	<body ng-app="elderTool">
+
+		<div ng-controller="twoScreenSystem">
+		 	
+		 	<form class="form-inline">
+			 	<label for="symbol">Symbol:</label>
+			 	<input type="text" class="form-control" id="symbol" ng-model="symbol" ng-keypress="fieldKeyPress($event)" />
+
+				<button type="button" class="btn btn-default" ng-click="moveForDays(-1)">-1D</button>
+				<button type="button" class="btn btn-default" ng-click="moveForDays(+1)">+1D</button>
+				<button type="button" class="btn btn-default" ng-click="moveForDays(-7)">-7D</button>
+				<button type="button" class="btn btn-default" ng-click="moveForDays(+7)">+7D</button>
+				<button type="button" class="btn btn-default" ng-click="moveForDays(-30)">-30D</button>
+				<button type="button" class="btn btn-default" ng-click="moveForDays(+30)">+30D</button>
+			</form>
+
+			<form class="form-inline">
+				<label for="weeklyFromDate">From (W):</label>
+				<input type="text" class="form-control" id="weeklyFromDate" ng-model="weeklyFromDate" ng-keypress="fieldKeyPress($event)" />
+
+				<label for="dailyFromDate">From (D):</label>
+				<input type="text" class="form-control" id="dailyFromDate" ng-model="dailyFromDate" ng-keypress="fieldKeyPress($event)" />
+
+				<label for="toDate">To:</label>
+				<input type="text" class="form-control" id="toDate" ng-model="toDate" ng-keypress="fieldKeyPress($event)" />
+			</form>
+
+			<img src="{{ weeklyChartUrl }}" />
+			<img src="{{ dailyChartUrl }}" />
+
+		</div>
+
+	</body>
+</html>
