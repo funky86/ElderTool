@@ -10,8 +10,8 @@
 	<script src="utils.js"></script>
 
 	<script>
-		var weeklyChartUrlFormat = 'https://stockcharts.com/c-sc/sc?s={0}&p=W&st={1}&en={2}&i=p03109540830&r=1537814132519';
-		var dailyChartUrlFormat = 'https://stockcharts.com/c-sc/sc?s={0}&p=D&st={1}&en={2}&i=p06466849456&r=1537882904610';
+		var weeklyChartUrlFormat = 'https://stockcharts.com/c-sc/sc?s={0}&p=W&st={1}&en={2}&i=p03109540830&';
+		var dailyChartUrlFormat = 'https://c.stockcharts.com/c-sc/sc?s={0}&p=D&st={1}&en={2}&i=t2270126226c&r=1542455093530';
 		var today = utils.dateToStr(new Date());
 
 		angular.module('elderTool', []).controller('twoScreenSystem', ['$scope', function($scope) {
@@ -38,6 +38,7 @@
 			$scope.render = function() {
 				$scope.weeklyChartUrl = weeklyChartUrlFormat.format($scope.symbol, $scope.weeklyFromDate, $scope.toDate);
 				$scope.dailyChartUrl = dailyChartUrlFormat.format($scope.symbol, $scope.dailyFromDate, $scope.toDate);
+				$scope.dayName = utils.GetDayName($scope.toDate);
 			};
 		}]);
 	</script>
@@ -67,6 +68,8 @@
 
 				<label for="toDate">To:</label>
 				<input type="text" class="form-control" id="toDate" ng-model="toDate" ng-keypress="fieldKeyPress($event)" />
+
+				<strong>{{ dayName }}</strong>
 			</form>
 
 			<img src="{{ weeklyChartUrl }}" />

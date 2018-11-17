@@ -19,5 +19,19 @@ var utils = {
 		var date = new Date(dateStr);
 		date.setDate(date.getDate() + days);
 		return utils.dateToStr(date);
-	}
+	},
+
+  GetDayName: function(dateStr) {
+    var date = new Date(dateStr);
+    switch (date.getDay()) {
+      case 0: return "Sunday";
+      case 1: return "Monday";
+      case 2: return "Tuesday";
+      case 3: return "Wednesday";
+      case 4: return "Thursday";
+      case 5: return "Friday";
+      case 6: return "Saturday";
+      default: return "UNKNOWN";
+    }
+  }
 };
