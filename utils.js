@@ -11,17 +11,19 @@ if (!String.prototype.format) {
 }
 
 var utils = {
+  YEAR_MILLISECONDS: 30758400000,
+
 	dateToStr: function(date) {
 		return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
 	},
 
-	getAddedDays: function(dateStr, days) {
+	getAddedDaysStr: function(dateStr, days) {
 		var date = new Date(dateStr);
 		date.setDate(date.getDate() + days);
 		return utils.dateToStr(date);
 	},
 
-  GetDayName: function(dateStr) {
+  getDayName: function(dateStr) {
     var date = new Date(dateStr);
     switch (date.getDay()) {
       case 0: return "Sunday";
@@ -33,5 +35,13 @@ var utils = {
       case 6: return "Saturday";
       default: return "UNKNOWN";
     }
+  },
+
+  getRandomInt: function(max) {
+    return Math.floor(Math.random() * max);
+  },
+
+  getRandomIntMinMax: function(min, max) {
+    return min + Math.floor(Math.random() * (max - min));
   }
 };

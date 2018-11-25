@@ -8,20 +8,18 @@
 
 	<!-- local -->
 	<script src="utils.js"></script>
+	<script src="data.js"></script>
 
 	<script>
 		var weeklyChartUrlFormat = 'https://stockcharts.com/c-sc/sc?s={0}&p=W&st={1}&en={2}&i=p03109540830&';
-		var dailyChartUrlFormat = 'https://c.stockcharts.com/c-sc/sc?s={0}&p=D&st={1}&en={2}&i=t2270126226c&r=1542455093530';
-		var today = utils.dateToStr(new Date());
+		var dailyChartUrlFormat = 'https://c.stockcharts.com/c-sc/sc?s={0}&p=D&st={1}&en={2}&i=p4936567059c';
 
 		angular.module('elderTool', []).controller('twoScreenSystem', ['$scope', function($scope) {
-			$scope.symbol = 'AAPL';
-			$scope.toDate = today;
-			$scope.weeklyFromDate = utils.getAddedDays(today, -356);
-			$scope.dailyFromDate = utils.getAddedDays(today, -90);
-
-			$scope.weeklyChartUrl = '';
-			$scope.dailyChartUrl = '';
+			$scope.init = function() {
+				$scope.symbol = 'AAPL';
+				$scope.weeklyChartUrl = '';
+				$scope.dailyChartUrl = '';
+			}
 
 			$scope.fieldKeyPress = function(event) {
 				if (event.keyCode == 13) {
@@ -29,17 +27,48 @@
 	 			}
 			};
 
+			$scope.setDates = function(dateStr) {
+				$scope.toDate = dateStr;
+				$scope.weeklyFromDate = utils.getAddedDaysStr(dateStr, -356);
+				$scope.dailyFromDate = utils.getAddedDaysStr(dateStr, -90);
+			};
+
+			$scope.today = function() {
+				var todayStr = utils.dateToStr(new Date());
+				$scope.setDates(todayStr);
+				$scope.render();
+			};
+
+			$scope.randomSymbolAndTime = function() {
+				// symbol
+				var array = data.symbols_1M;
+				var randIdx = utils.getRandomInt(array.length);
+				$scope.symbol = array[randIdx];
+
+				// time
+				var now = new Date().getTime();
+				var max = now - 1 * utils.YEAR_MILLISECONDS;
+				var min = now - 19 * utils.YEAR_MILLISECONDS;
+				var rand = utils.getRandomIntMinMax(min, max);
+
+				var dateStr = utils.dateToStr(new Date(rand));
+				$scope.setDates(dateStr);
+				$scope.render();
+			};
+
 			$scope.moveForDays = function(day) {
-				$scope.weeklyFromDate = utils.getAddedDays($scope.weeklyFromDate, day);
-				$scope.dailyFromDate = utils.getAddedDays($scope.dailyFromDate, day);
-				$scope.toDate = utils.getAddedDays($scope.toDate, day);
+				$scope.weeklyFromDate = utils.getAddedDaysStr($scope.weeklyFromDate, day);
+				$scope.dailyFromDate = utils.getAddedDaysStr($scope.dailyFromDate, day);
+				$scope.toDate = utils.getAddedDaysStr($scope.toDate, day);
 				$scope.render();
 			};
 			$scope.render = function() {
 				$scope.weeklyChartUrl = weeklyChartUrlFormat.format($scope.symbol, $scope.weeklyFromDate, $scope.toDate);
 				$scope.dailyChartUrl = dailyChartUrlFormat.format($scope.symbol, $scope.dailyFromDate, $scope.toDate);
-				$scope.dayName = utils.GetDayName($scope.toDate);
+				$scope.dayName = utils.getDayName($scope.toDate);
 			};
+
+			$scope.init();
 		}]);
 	</script>
 
@@ -51,12 +80,20 @@
 			 	<label for="symbol">Symbol:</label>
 			 	<input type="text" class="form-control" id="symbol" ng-model="symbol" ng-keypress="fieldKeyPress($event)" />
 
+				<button type="button" class="btn btn-info" ng-click="today()">Today</button>
+				<button type="button" class="btn btn-info" ng-click="randomSymbolAndTime()">Random</button>
+
 				<button type="button" class="btn btn-default" ng-click="moveForDays(-1)">-1D</button>
 				<button type="button" class="btn btn-default" ng-click="moveForDays(+1)">+1D</button>
 				<button type="button" class="btn btn-default" ng-click="moveForDays(-7)">-7D</button>
 				<button type="button" class="btn btn-default" ng-click="moveForDays(+7)">+7D</button>
 				<button type="button" class="btn btn-default" ng-click="moveForDays(-30)">-30D</button>
 				<button type="button" class="btn btn-default" ng-click="moveForDays(+30)">+30D</button>
+				<button type="button" class="btn btn-default" ng-click="moveForDays(-90)">-90D</button>
+				<button type="button" class="btn btn-default" ng-click="moveForDays(+90)">+90D</button>
+				<button type="button" class="btn btn-default" ng-click="moveForDays(-180)">-180D</button>
+				<button type="button" class="btn btn-default" ng-click="moveForDays(+180)">+180D</button>
+
 			</form>
 
 			<form class="form-inline">
