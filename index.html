@@ -9,12 +9,14 @@
 	<!-- local -->
 	<script src="utils.js"></script>
 	<script src="data.js"></script>
+	<script src="MainControllerHelper.js"></script>
 
 	<script>
-		var weeklyChartUrlFormat = 'https://stockcharts.com/c-sc/sc?s={0}&p=W&st={1}&en={2}&i=p03109540830&';
-		var dailyChartUrlFormat = 'https://c.stockcharts.com/c-sc/sc?s={0}&p=D&st={1}&en={2}&i=p4936567059c';
+		var weeklyChartUrlFormat = "https://stockcharts.com/c-sc/sc?s={0}&p=W&st={1}&en={2}&i=p03109540830&";
+		var dailyChartUrlFormat = "https://c.stockcharts.com/c-sc/sc?s={0}&p=D&st={1}&en={2}&i=p4936567059c";
+		var simulateUrlFormat = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={0}&outputsize=full&apikey=FLKE8SVF0TUQ08I7";
 
-		angular.module('elderTool', []).controller('twoScreenSystem', ['$scope', function($scope) {
+		angular.module('ElderToolApp', []).controller('MainController', ['$scope', '$http', function($scope, $http) {
 			$scope.init = function() {
 				$scope.symbol = 'AAPL';
 				$scope.weeklyChartUrl = '';
@@ -68,13 +70,48 @@
 				$scope.dayName = utils.getDayName($scope.toDate);
 			};
 
+			$scope.simulate = function() {
+				var entry = $scope.entry;
+				var target = $scope.target;
+				var stop = $scope.stop;
+
+				$http({
+				  method: "GET",
+				  url: simulateUrlFormat.format($scope.symbol)
+				}).then(function successCallback(response) {
+					var seriesSrc = response.data["Time Series (Daily)"];
+					var series = mainControllerHelper.readStockValues(seriesSrc, $scope.toDate);
+
+					for (var i = series.length - 1; i >= 0; i--) {
+						console.log(series[i]);
+						var date = series[i]["date"];
+						var low = series[i]["low"];
+						var high = series[i]["high"];
+						
+						if (low <= stop) {
+							$scope.setSimulateResult("LOOSE", low, date);
+							return;
+						} else if (high >= target) {
+							$scope.setSimulateResult("WIN", high, date);
+							return;
+						}
+					}
+
+					$scope.setSimulateResult("NO_FIND", null, null);
+				});
+			};
+			$scope.setSimulateResult = function(result, price, date) {
+				var text = "result: {0} price: {1} date: {2}".format(result, price, date);
+				$scope.simulateResultText = text;
+			};
+
 			$scope.init();
 		}]);
 	</script>
 
-	<body ng-app="elderTool">
+	<body ng-app="ElderToolApp">
 
-		<div ng-controller="twoScreenSystem">
+		<div ng-controller="MainController">
 		 	
 		 	<form class="form-inline">
 			 	<label for="symbol">Symbol:</label>
@@ -107,6 +144,21 @@
 				<input type="text" class="form-control" id="toDate" ng-model="toDate" ng-keypress="fieldKeyPress($event)" />
 
 				<strong>{{ dayName }}</strong>
+			</form>
+
+			<form class="form-inline">
+				<label for="entry">Entry:</label>
+				<input type="text" class="form-control" id="entry" ng-model="entry" />
+
+				<label for="stop">Stop:</label>
+				<input type="text" class="form-control" id="stop" ng-model="stop" />
+
+				<label for="target">Target:</label>
+				<input type="text" class="form-control" id="target" ng-model="target" />
+
+				<button type="button" class="btn btn-info" ng-click="simulate()">Simulate</button>
+
+				<strong>{{ simulateResultText }}</strong>
 			</form>
 
 			<img src="{{ weeklyChartUrl }}" />
