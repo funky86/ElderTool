@@ -12,11 +12,13 @@
 	<script src="MainControllerHelper.js"></script>
 
 	<script>
-		var weeklyChartUrlFormat = "https://stockcharts.com/c-sc/sc?s={0}&p=W&st={1}&en={2}&i=p03109540830&";
-		var dailyChartUrlFormat = "https://c.stockcharts.com/c-sc/sc?s={0}&p=D&st={1}&en={2}&i=p4936567059c";
+		// HTTP request URLs
+		var weeklyChartUrlFormat = "http://stockcharts.com/c-sc/sc?s={0}&p=W&st={1}&en={2}&i=p03109540830&";
+		var dailyChartUrlFormat = "http://c.stockcharts.com/c-sc/sc?s={0}&p=D&st={1}&en={2}&i=p4936567059c";
 		var simulateUrlFormat = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={0}&outputsize=full&apikey=FLKE8SVF0TUQ08I7";
+		var backendInsertUrlFormat = "http://tradeschool.gearhostpreview.com/backend/insert.php?symbol={0}&date_time={1}&entry_price={2}&exit_price={3}";
 
-		angular.module('ElderToolApp', []).controller('MainController', ['$scope', '$http', function($scope, $http) {
+		angular.module('TradeSchoolApp', []).controller('MainController', ['$scope', '$http', function($scope, $http) {
 			$scope.init = function() {
 				$scope.symbol = 'AAPL';
 				$scope.weeklyChartUrl = '';
@@ -71,6 +73,7 @@
 			};
 
 			$scope.simulate = function() {
+				var symbol = $scope.symbol;
 				var entry = $scope.entry;
 				var target = $scope.target;
 				var stop = $scope.stop;
@@ -89,10 +92,10 @@
 						var high = series[i]["high"];
 						
 						if (low <= stop) {
-							$scope.setSimulateResult("LOOSE", low, date);
+							$scope.setSimulateResult("LOOSE", symbol, entry, low, date);
 							return;
 						} else if (high >= target) {
-							$scope.setSimulateResult("WIN", high, date);
+							$scope.setSimulateResult("WIN", symbol, entry, high, date);
 							return;
 						}
 					}
@@ -100,16 +103,26 @@
 					$scope.setSimulateResult("NO_FIND", null, null);
 				});
 			};
-			$scope.setSimulateResult = function(result, price, date) {
-				var text = "result: {0} price: {1} date: {2}".format(result, price, date);
+			$scope.setSimulateResult = function(result, symbol, entry, exit, date) {
+				var text = "result: {0} exit: {1} date: {2}".format(result, exit, date);
 				$scope.simulateResultText = text;
+
+				$scope.insertIntoDatabase(symbol, date, entry, exit);
+			};
+			$scope.insertIntoDatabase = function(symbol, dateTime, entryPrice, exitPrice) {
+				$http({
+					method: "GET",
+					url: backendInsertUrlFormat.format(symbol, dateTime, entryPrice, exitPrice)
+				}).then(function successCallback(response) {
+					console.log(response);
+				});
 			};
 
 			$scope.init();
 		}]);
 	</script>
 
-	<body ng-app="ElderToolApp">
+	<body ng-app="TradeSchoolApp">
 
 		<div ng-controller="MainController">
 		 	
