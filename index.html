@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <html>
+	<head>
+		<title>Trade School</title>
+	</head>
+
 	<!-- external -->
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -14,7 +18,7 @@
 	<script>
 		// HTTP request URLs
 		var weeklyChartUrlFormat = "http://stockcharts.com/c-sc/sc?s={0}&p=W&st={1}&en={2}&i=p03109540830&";
-		var dailyChartUrlFormat = "http://c.stockcharts.com/c-sc/sc?s={0}&p=D&st={1}&en={2}&i=p4936567059c";
+		var dailyChartUrlFormat = "http://c.stockcharts.com/c-sc/sc?s={0}&p=D&st={1}&en={2}&i=p7343648708c";
 		var simulateUrlFormat = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={0}&outputsize=full&apikey=FLKE8SVF0TUQ08I7";
 		var backendInsertUrlFormat = "http://tradeschool.gearhostpreview.com/backend/insert.php?symbol={0}&date_time={1}&entry_price={2}&exit_price={3}";
 
@@ -72,6 +76,12 @@
 				$scope.dayName = utils.getDayName($scope.toDate);
 			};
 
+			$scope.clearSimulateFields = function() {
+				$scope.entry = "";
+				$scope.stop = "";
+				$scope.target = "";
+				$scope.exit = "";
+			};
 			$scope.simulate = function() {
 				var symbol = $scope.symbol;
 				var entry = $scope.entry;
@@ -92,20 +102,30 @@
 						var high = series[i]["high"];
 						
 						if (low <= stop) {
-							$scope.setSimulateResult("LOOSE", symbol, entry, low, date);
+							$scope.setSimulateResult("LOOSE", true, symbol, entry, low, date);
 							return;
 						} else if (high >= target) {
-							$scope.setSimulateResult("WIN", symbol, entry, high, date);
+							$scope.setSimulateResult("WIN", true, symbol, entry, high, date);
 							return;
 						}
 					}
 
-					$scope.setSimulateResult("NO_FIND", null, null);
+					$scope.setSimulateResult("NO_FIND", false, null, null, null, null);
 				});
 			};
-			$scope.setSimulateResult = function(result, symbol, entry, exit, date) {
+			$scope.setSimulateResult = function(result, insertDb, symbol, entry, exit, date) {
 				var text = "result: {0} exit: {1} date: {2}".format(result, exit, date);
 				$scope.simulateResultText = text;
+
+				if (insertDb) {
+					$scope.insertIntoDatabase(symbol, date, entry, exit);
+				}
+			};
+			$scope.manual = function() {
+				var symbol = $scope.symbol;
+				var date = utils.dateToStrFull(new Date());
+				var entry = $scope.entry;
+				var exit = $scope.exit;
 
 				$scope.insertIntoDatabase(symbol, date, entry, exit);
 			};
@@ -159,6 +179,12 @@
 				<strong>{{ dayName }}</strong>
 			</form>
 
+			<hr />
+
+			<form class="form-inline">
+				<button type="button" class="btn btn-info" ng-click="clearSimulateFields()">Clear</button>
+			</form>
+
 			<form class="form-inline">
 				<label for="entry">Entry:</label>
 				<input type="text" class="form-control" id="entry" ng-model="entry" />
@@ -173,6 +199,15 @@
 
 				<strong>{{ simulateResultText }}</strong>
 			</form>
+
+			<form class="form-inline">
+				<label for="exit">Exit:</label>
+				<input type="text" class="form-control" id="exit" ng-model="exit" />
+
+				<button type="button" class="btn btn-info" ng-click="manual()">Manual</button>
+			</form>
+
+			<hr />
 
 			<img src="{{ weeklyChartUrl }}" />
 			<img src="{{ dailyChartUrl }}" />
