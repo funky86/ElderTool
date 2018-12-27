@@ -14,6 +14,10 @@ var utils = {
   YEAR_MILLISECONDS: 30758400000,
   DAY_MILLISECONDS: 86400000,
 
+  round: function(value, decimals) {
+    return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+  },
+
 	dateToStr: function(date) {
 		return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
 	},

@@ -27,6 +27,13 @@
 				$scope.symbol = 'AAPL';
 				$scope.weeklyChartUrl = '';
 				$scope.dailyChartUrl = '';
+
+				$scope.positionStats = {
+					stopPercent: "",
+					targetPercent: "",
+					ratio: "",
+					cssClass: "alert-success"
+				};
 			}
 
 			$scope.fieldKeyPress = function(event) {
@@ -47,6 +54,7 @@
 				$scope.render();
 			};
 
+			// pick a random symbol and time frame
 			$scope.randomSymbolAndTime = function() {
 				// symbol
 				var array = data.symbols_1M;
@@ -82,6 +90,55 @@
 				$scope.target = "";
 				$scope.exit = "";
 			};
+			// do some calculations based on simulate fields (e.g. stop and target percentage, ratio)
+			$scope.simulateFieldsKeyPress = function() {
+				var entry = parseFloat($scope.entry);
+				var stop = parseFloat($scope.stop);
+				var target = parseFloat($scope.target);
+
+				var stopPercent = "";
+				var targetPercent = "";
+				var ratio = "";
+
+				if (!isNaN(entry) && !isNaN(stop)) {
+					if (entry != 0) {
+						stopPercent = (entry - stop) / entry * 100.0;
+					}	
+				}
+				if (!isNaN(entry) && !isNaN(target)) {
+					if (entry != 0) {
+						targetPercent = (target - entry) / entry * 100.0;
+					}
+				}
+				if (!isNaN(entry) && !isNaN(stop) && !isNaN(target)) {
+					if (entry - stop != 0) {
+						ratio = (target - entry) / (entry - stop);
+					}
+				}
+
+				if (stopPercent != "") {
+					stopPercent = utils.round(stopPercent, 2);
+					stopPercent = "-" + stopPercent + "%";
+				}
+				if (targetPercent != "") {
+					targetPercent = utils.round(targetPercent, 2);
+					targetPercent += "%";
+				}
+				if (ratio != "") {
+					ratio = utils.round(ratio, 2);
+
+					if (ratio >= 2) {
+						$scope.positionStats.cssClass = "alert-success";
+					} else {
+						$scope.positionStats.cssClass = "alert-danger";
+					}
+				}
+
+				$scope.positionStats.stopPercent = stopPercent;
+				$scope.positionStats.targetPercent = targetPercent;
+				$scope.positionStats.ratio = ratio;
+			};
+			// simulate trade and store the outcome into the DB
 			$scope.simulate = function() {
 				var symbol = $scope.symbol;
 				var entry = $scope.entry;
@@ -113,6 +170,7 @@
 					$scope.setSimulateResult("NO_FIND", false, null, null, null, null);
 				});
 			};
+			// show simulate results and store values into DB
 			$scope.setSimulateResult = function(result, insertDb, symbol, entry, exit, date) {
 				var text = "result: {0} exit: {1} date: {2}".format(result, exit, date);
 				$scope.simulateResultText = text;
@@ -121,6 +179,7 @@
 					$scope.insertIntoDatabase(symbol, date, entry, exit);
 				}
 			};
+			// store manual fields for simulating trade into the DB
 			$scope.manual = function() {
 				var symbol = $scope.symbol;
 				var date = utils.dateToStrFull(new Date());
@@ -129,6 +188,7 @@
 
 				$scope.insertIntoDatabase(symbol, date, entry, exit);
 			};
+			// insert trade values into the DB
 			$scope.insertIntoDatabase = function(symbol, dateTime, entryPrice, exitPrice) {
 				$http({
 					method: "GET",
@@ -182,18 +242,28 @@
 			<hr />
 
 			<form class="form-inline">
-				<button type="button" class="btn btn-info" ng-click="clearSimulateFields()">Clear</button>
+				<div class="row">
+					<div class="col-sm-1">
+						<button type="button" class="btn btn-info" ng-click="clearSimulateFields()">Clear</button>
+					</div>
+
+					<div class="col-sm-4">
+						<div class="alert {{ positionStats.cssClass }}" role="alert">
+							Stop: {{ positionStats.stopPercent }} Target: {{ positionStats.targetPercent }} Ratio: {{ positionStats.ratio }}
+						</div>
+					</div>
+				</div>
 			</form>
 
 			<form class="form-inline">
 				<label for="entry">Entry:</label>
-				<input type="text" class="form-control" id="entry" ng-model="entry" />
+				<input type="text" class="form-control" id="entry" ng-model="entry" ng-change="simulateFieldsKeyPress()" />
 
 				<label for="stop">Stop:</label>
-				<input type="text" class="form-control" id="stop" ng-model="stop" />
+				<input type="text" class="form-control" id="stop" ng-model="stop" ng-change="simulateFieldsKeyPress()" />
 
 				<label for="target">Target:</label>
-				<input type="text" class="form-control" id="target" ng-model="target" />
+				<input type="text" class="form-control" id="target" ng-model="target" ng-change="simulateFieldsKeyPress()" />
 
 				<button type="button" class="btn btn-info" ng-click="simulate()">Simulate</button>
 
