@@ -20,7 +20,7 @@
 		var weeklyChartUrlFormat = "http://c.stockcharts.com/c-sc/sc?s={0}&p=W&st={1}&en={2}&i=p9822565786c";
 		var dailyChartUrlFormat = "http://c.stockcharts.com/c-sc/sc?s={0}&p=D&st={1}&en={2}&i=p7343648708c";
 		var simulateUrlFormat = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={0}&outputsize=full&apikey=FLKE8SVF0TUQ08I7";
-		var backendInsertUrlFormat = "http://tradeschool.gearhostpreview.com/backend/insert.php?symbol={0}&date_time={1}&entry_price={2}&exit_price={3}";
+		var backendInsertUrlFormat = "http://tradeschool.gearhostpreview.com/backend/insert.php?symbol={0}&entry_date={1}&entry_price={2}&exit_date={3}&exit_price={4}";
 
 		angular.module('TradeSchoolApp', []).controller('MainController', ['$scope', '$http', function($scope, $http) {
 			$scope.init = function() {
@@ -34,6 +34,9 @@
 					ratio: "",
 					cssClass: "alert-success"
 				};
+
+				// init Bootstrap tooltips
+				$('[data-toggle="tooltip"]').tooltip();
 			}
 
 			$scope.fieldKeyPress = function(event) {
@@ -89,6 +92,10 @@
 				$scope.stop = "";
 				$scope.target = "";
 				$scope.exit = "";
+			};
+			// copy toDate into the provided scope's attribute
+			$scope.copyToDate = function(attribute) {
+				$scope[attribute] = $scope.toDate;
 			};
 			// do some calculations based on simulate fields (e.g. stop and target percentage, ratio)
 			$scope.simulateFieldsKeyPress = function() {
@@ -176,23 +183,24 @@
 				$scope.simulateResultText = text;
 
 				if (insertDb) {
-					$scope.insertIntoDatabase(symbol, date, entry, exit);
+					//$scope.insertIntoDatabase(symbol, date, entry, exit);
 				}
 			};
 			// store manual fields for simulating trade into the DB
 			$scope.manual = function() {
 				var symbol = $scope.symbol;
-				var date = utils.dateToStrFull(new Date());
+				var entryDate = $scope.entryDate;
 				var entry = $scope.entry;
+				var exitDate = $scope.exitDate;
 				var exit = $scope.exit;
 
-				$scope.insertIntoDatabase(symbol, date, entry, exit);
+				$scope.insertIntoDatabase(symbol, entryDate, entry, exitDate, exit);
 			};
 			// insert trade values into the DB
-			$scope.insertIntoDatabase = function(symbol, dateTime, entryPrice, exitPrice) {
+			$scope.insertIntoDatabase = function(symbol, entryDate, entryPrice, exitDate, exitPrice) {
 				$http({
 					method: "GET",
-					url: backendInsertUrlFormat.format(symbol, dateTime, entryPrice, exitPrice)
+					url: backendInsertUrlFormat.format(symbol, entryDate, entryPrice, exitDate, exitPrice)
 				}).then(function successCallback(response) {
 					console.log(response);
 				});
@@ -271,6 +279,14 @@
 			</form>
 
 			<form class="form-inline">
+				<label for="entry_date">Entry date:</label>
+				<input type="text" class="form-control" id="entry_date" ng-model="entryDate" />
+				<button type="button" class="btn btn-info" ng-click="copyToDate('entryDate')" data-toggle="tooltip" title="Copy To Date">+</button>
+
+				<label for="exit_date">Exit date:</label>
+				<input type="text" class="form-control" id="exit_date" ng-model="exitDate" />
+				<button type="button" class="btn btn-info" ng-click="copyToDate('exitDate')" data-toggle="tooltip" title="Copy To Date">+</button>
+
 				<label for="exit">Exit:</label>
 				<input type="text" class="form-control" id="exit" ng-model="exit" />
 
