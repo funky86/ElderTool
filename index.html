@@ -19,7 +19,6 @@
 		// HTTP request URLs
 		var weeklyChartUrlFormat = "http://c.stockcharts.com/c-sc/sc?s={0}&p=W&st={1}&en={2}&i=p9822565786c";
 		var dailyChartUrlFormat = "http://c.stockcharts.com/c-sc/sc?s={0}&p=D&st={1}&en={2}&i=p7343648708c";
-		var simulateUrlFormat = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={0}&outputsize=full&apikey=FLKE8SVF0TUQ08I7";
 		var backendInsertUrlFormat = "http://tradeschool.gearhostpreview.com/backend/insert.php?symbol={0}&entry_date={1}&entry_price={2}&exit_date={3}&exit_price={4}";
 
 		angular.module('TradeSchoolApp', []).controller('MainController', ['$scope', '$http', function($scope, $http) {
@@ -152,47 +151,6 @@
 				$scope.positionStats.targetPercent = targetPercent;
 				$scope.positionStats.ratio = ratio;
 			};
-			// simulate trade and store the outcome into the DB
-			$scope.simulate = function() {
-				var symbol = $scope.symbol;
-				var entry = $scope.entry;
-				var target = $scope.target;
-				var stop = $scope.stop;
-
-				$http({
-				  method: "GET",
-				  url: simulateUrlFormat.format($scope.symbol)
-				}).then(function successCallback(response) {
-					var seriesSrc = response.data["Time Series (Daily)"];
-					var series = mainControllerHelper.readStockValues(seriesSrc, $scope.toDate);
-
-					for (var i = series.length - 1; i >= 0; i--) {
-						console.log(series[i]);
-						var date = series[i]["date"];
-						var low = series[i]["low"];
-						var high = series[i]["high"];
-						
-						if (low <= stop) {
-							$scope.setSimulateResult("LOOSE", true, symbol, entry, low, date);
-							return;
-						} else if (high >= target) {
-							$scope.setSimulateResult("WIN", true, symbol, entry, high, date);
-							return;
-						}
-					}
-
-					$scope.setSimulateResult("NO_FIND", false, null, null, null, null);
-				});
-			};
-			// show simulate results and store values into DB
-			$scope.setSimulateResult = function(result, insertDb, symbol, entry, exit, date) {
-				var text = "result: {0} exit: {1} date: {2}".format(result, exit, date);
-				$scope.simulateResultText = text;
-
-				if (insertDb) {
-					//$scope.insertIntoDatabase(symbol, date, entry, exit);
-				}
-			};
 			// store manual fields for simulating trade into the DB
 			$scope.manual = function() {
 				var symbol = $scope.symbol;
@@ -279,10 +237,6 @@
 
 				<label for="target">Target:</label>
 				<input type="text" class="form-control" id="target" ng-model="target" ng-change="simulateFieldsKeyPress()" />
-
-				<button type="button" class="btn btn-info" ng-click="simulate()">Simulate</button>
-
-				<strong>{{ simulateResultText }}</strong>
 			</form>
 
 			<form class="form-inline">
