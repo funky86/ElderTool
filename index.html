@@ -23,21 +23,24 @@
 		var backendInsertUrlFormat = "http://tradeschool.gearhostpreview.com/backend/insert.php?symbol={0}&entry_date={1}&entry_price={2}&exit_date={3}&exit_price={4}";
 
 		angular.module('TradeSchoolApp', []).controller('MainController', ['$scope', '$http', function($scope, $http) {
-			$scope.init = function() {
-				$scope.symbol = 'AAPL';
-				$scope.weeklyChartUrl = '';
-				$scope.dailyChartUrl = '';
-
+			$scope.initPositionStats = function() {
 				$scope.positionStats = {
 					stopPercent: "",
 					targetPercent: "",
 					ratio: "",
 					cssClass: "alert-success"
 				};
+			};
+			$scope.init = function() {
+				$scope.symbol = 'AAPL';
+				$scope.weeklyChartUrl = '';
+				$scope.dailyChartUrl = '';
+
+				$scope.initPositionStats();
 
 				// init Bootstrap tooltips
 				$('[data-toggle="tooltip"]').tooltip();
-			}
+			};
 
 			$scope.fieldKeyPress = function(event) {
 				if (event.keyCode == 13) {
@@ -88,10 +91,14 @@
 			};
 
 			$scope.clearSimulateFields = function() {
+				$scope.entryDate = "";
 				$scope.entry = "";
 				$scope.stop = "";
 				$scope.target = "";
+				$scope.exitDate = "";
 				$scope.exit = "";
+
+				$scope.initPositionStats();
 			};
 			// copy toDate into the provided scope's attribute
 			$scope.copyToDate = function(attribute) {
