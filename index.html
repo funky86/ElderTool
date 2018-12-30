@@ -120,6 +120,31 @@
 				$scope.weeklyFromDate = utils.getAddedDaysStr($scope.weeklyFromDate, day);
 				$scope.dailyFromDate = utils.getAddedDaysStr($scope.dailyFromDate, day);
 				$scope.toDate = utils.getAddedDaysStr($scope.toDate, day);
+
+				// make it land on Friday (calculate diff)
+				var date = new Date($scope.toDate);
+				var diff = 0;
+				if (day > 0) {
+					if (date.getDay() == 6) {
+						diff = 2;
+					} else if (date.getDay() == 0) {
+						diff = 1;
+					}
+				} else if (day < 0) {
+					if (date.getDay() == 6) {
+						diff = -1;
+					} else if (date.getDay() == 0) {
+						diff = -2;
+					}
+				}
+
+				if (diff != 0) {
+					var timestamp = date.getTime();
+					timestamp += diff * utils.DAY_MILLISECONDS;
+					date = new Date(timestamp);
+					$scope.toDate = utils.dateToStr(date);
+				}
+
 				$scope.render();
 				$scope.$apply();
 			};
