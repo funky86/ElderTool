@@ -37,8 +37,24 @@
 
 				$scope.initPositionStats();
 
+				// read params
+				var runRender = false;
+				var params = new URLSearchParams(window.location.search);
+				if (params.has('symbol')) {
+					$scope.symbol = params.get('symbol');
+				}
+				if (params.has('toDate')) {
+					$scope.toDate = params.get('toDate');
+					runRender = true;
+				}
+
 				// init Bootstrap tooltips
 				$('[data-toggle="tooltip"]').tooltip();
+
+				if (runRender) {
+					$scope.setDates($scope.toDate);
+					$scope.render();
+				}
 			};
 
 			$scope.fieldKeyPress = function(event) {
