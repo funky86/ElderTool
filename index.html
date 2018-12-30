@@ -86,8 +86,8 @@
 				$scope.render();
 			};
 
-			// pick a random symbol and time frame
-			$scope.randomSymbolAndTime = function() {
+			// pick a random symbol and a Friday
+			$scope.randomSymbolAndFriday = function() {
 				// symbol
 				var array = data.symbols_1M;
 				var randIdx = utils.getRandomInt(array.length);
@@ -99,7 +99,19 @@
 				var min = now - 19 * utils.YEAR_MILLISECONDS;
 				var rand = utils.getRandomIntMinMax(min, max);
 
-				var dateStr = utils.dateToStr(new Date(rand));
+				var randDate = new Date(rand);
+				if (randDate.getDay() >= 1 && randDate.getDay() <= 4) { // Mon-Thu
+					rand += utils.DAY_MILLISECONDS * (5 - randDate.getDay());
+					randDate = new Date(rand);
+				} else if (randDate.getDay() == 0) { // Sun
+					rand += utils.DAY_MILLISECONDS * (randDate.getDay() - 2);
+					randDate = new Date(rand);
+				} else if (andDate.getDay() == 6) { // Sat
+					rand += utils.DAY_MILLISECONDS * (randDate.getDay() - 1);
+					randDate = new Date(rand);
+				}
+
+				var dateStr = utils.dateToStr(randDate);
 				$scope.setDates(dateStr);
 				$scope.render();
 			};
@@ -222,7 +234,7 @@
 			 	<input type="text" class="form-control" id="symbol" ng-model="symbol" ng-keypress="fieldKeyPress($event)" />
 
 				<button type="button" class="btn btn-info" ng-click="today()">Today</button>
-				<button type="button" class="btn btn-info" ng-click="randomSymbolAndTime()">Random</button>
+				<button type="button" class="btn btn-info" ng-click="randomSymbolAndFriday()">Random Friday</button>
 
 				<button type="button" class="btn btn-default" ng-click="moveForDays(-1)">-1D</button>
 				<button type="button" class="btn btn-default" ng-click="moveForDays(+1)">+1D</button>
