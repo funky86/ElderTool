@@ -53,12 +53,25 @@
 				// init Bootstrap tooltips
 				$('[data-toggle="tooltip"]').tooltip();
 
+				$scope.enableKeyDaysMove = false;
+				$document.bind('keydown', function (e) {
+					var key = event.keyCode;
+					if (key == 18) { // Alt (Opt on Mac)
+						$scope.enableKeyDaysMove = true;
+					}
+				});
 				$document.bind('keyup', function (e) {
 					var key = event.keyCode;
-					if (key == 37) { // left
-						$scope.moveForDays(-1);
-					} else if (key == 39) { // right
-						$scope.moveForDays(1);
+					if (key == 18) { // Alt (Opt on Mac)
+						$scope.enableKeyDaysMove = false;
+					}
+
+					if ($scope.enableKeyDaysMove) {
+						if (key == 37) { // left
+							$scope.moveForDays(-1);
+						} else if (key == 39) { // right
+							$scope.moveForDays(1);
+						}
 					}
 				});
 
