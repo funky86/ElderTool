@@ -17,9 +17,9 @@ if (!isset($symbol) || !isset($entry_date) || !isset($entry_price) || !isset($ex
 
 $conn = getDatabaseConnection();
 
-$query = "INSERT INTO trades (symbol, entry_date, entry_price, exit_date, exit_price) VALUES (?, ?, ?, ?, ?)";
+$query = "INSERT INTO trades (created_date, symbol, entry_date, entry_price, exit_date, exit_price) VALUES (?, ?, ?, ?, ?, ?)";
 
-$params = array($symbol, new DateTime($entry_date), $entry_price, new DateTime($exit_date), $exit_price);
+$params = array(new DateTime(), $symbol, new DateTime($entry_date), $entry_price, new DateTime($exit_date), $exit_price);
 
 $stmt = sqlsrv_query($conn, $query, $params);
 
