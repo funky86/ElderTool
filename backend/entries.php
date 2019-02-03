@@ -2,24 +2,24 @@
 
 // Prints out entries in the 'trades' DB table.
 
+header("Access-Control-Allow-Origin: *");
+
 require('utils.php');
 
 $conn = getDatabaseConnection();
 
-$query = "SELECT * FROM trades";
+$query = "SELECT * FROM trades ORDER BY created_date ASC";
 
-$stmt = sqlsrv_query($conn, $query);
+$result = mysqli_query($conn, $query);
 
-if ($stmt === false) {
-	die(print_r(sqlsrv_errors(), true));
+$records = array();
+
+while ($row = mysqli_fetch_assoc($result)) {
+	array_push($records, $row);
 }
 
-while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-	echo $row['symbol'] . ", " . $row['entry_price'] . ", " . $row['exit_price'] . "<br />";
-}
+echo json_encode($records);
 
-sqlsrv_close($conn);
-
-echo $result;
+mysqli_close($conn);
 
 ?>

@@ -2,9 +2,11 @@
 
 // Contains global variables for e.g. database connection attributes.
 
-$GLOBALS['server_name'] = "den1.mssql7.gear.host";
-$GLOBALS['username'] = "tradeschool";
-$GLOBALS['password'] = "Ln1tTa-Gq-0T";
+$GLOBALS['server_type'] = 'MySQL'; // supported value: MySQL, MSSQL
+
+$GLOBALS['server_name'] = "localhost";
+$GLOBALS['username'] = "root";
+$GLOBALS['password'] = "m0j4HUDAbaza";
 $GLOBALS['database'] = "tradeschool";
 
 ?>
