@@ -233,8 +233,8 @@
 				$scope.positionStats.targetPercent = targetPercent;
 				$scope.positionStats.ratio = ratio;
 			};
-			// store manual fields for simulating trade into the DB
-			$scope.manual = function() {
+			// store data from fields into the DB for simulating the trade
+			$scope.saveTrade = function() {
 				var symbol = $scope.symbol;
 				var entryDate = $scope.entryDate;
 				var entry = $scope.entry;
@@ -396,7 +396,7 @@
 							<label for="exit">Exit:</label>
 							<input type="text" class="form-control" id="exit" ng-model="exit" />
 
-							<button type="button" class="btn btn-info" ng-click="manual()">Manual</button>
+							<button type="button" class="btn btn-info" ng-click="saveTrade()">Save</button>
 						</form>
 					</div>
 
