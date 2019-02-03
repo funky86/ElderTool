@@ -15,19 +15,18 @@ if (!isset($symbol) || !isset($entry_date) || !isset($entry_price) || !isset($ex
 	exit();
 }
 
+$created_date = date('Y-m-d H:i:s');
+
 $conn = getDatabaseConnection();
 
-$query = "INSERT INTO trades (created_date, symbol, entry_date, entry_price, exit_date, exit_price) VALUES (?, ?, ?, ?, ?, ?)";
+$query = "INSERT INTO trades (symbol, created_date, entry_date, entry_price, exit_date, exit_price) VALUES ('$symbol', '$created_date', '$entry_date', $entry_price, '$exit_date', $exit_price)";
 
-$params = array(new DateTime(), $symbol, new DateTime($entry_date), $entry_price, new DateTime($exit_date), $exit_price);
-
-$stmt = sqlsrv_query($conn, $query, $params);
-
-if ($stmt === false) {
-	echo '-2';
-	//die(print_r(sqlsrv_errors(), true));
-} else {
+if (mysqli_query($conn, $query)) {
 	echo '0';
+} else {
+	echo '-2';
 }
+
+mysqli_close($conn);
 
 ?>

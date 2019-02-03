@@ -2,8 +2,6 @@
 
 // Prints out entries in the 'trades' DB table.
 
-header("Access-Control-Allow-Origin: *");
-
 require('utils.php');
 
 $conn = getDatabaseConnection();

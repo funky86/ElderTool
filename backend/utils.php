@@ -2,6 +2,8 @@
 
 // Contains utility functions e.g. obtaining a DB connection.
 
+header("Access-Control-Allow-Origin: *");
+
 require('config.php');
 
 function getDatabaseConnection() {

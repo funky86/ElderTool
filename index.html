@@ -20,8 +20,9 @@
 		// HTTP request URLs
 		var weeklyChartUrlFormat = "http://c.stockcharts.com/c-sc/sc?s={0}&p=W&st={1}&en={2}&i=p8977698314c";
 		var dailyChartUrlFormat = "http://c.stockcharts.com/c-sc/sc?s={0}&p=D&st={1}&en={2}&i=p5439248205c";
-		var backendInsertUrlFormat = "http://tradeschool.gearhostpreview.com/backend/insert.php?symbol={0}&entry_date={1}&entry_price={2}&exit_date={3}&exit_price={4}";
-		var backendEntriesUrl = "http://localhost:8888/TradeSchool/backend/entries.php";
+		var backend = "http://localhost:8888/TradeSchool/backend/";
+		var backendInsertUrlFormat = backend + "insert.php?symbol={0}&entry_date={1}&entry_price={2}&exit_date={3}&exit_price={4}";
+		var backendEntriesUrl = backend + "entries.php";
 
 		angular.module('TradeSchoolApp', []).controller('MainController', ['$scope', '$http', '$document', function($scope, $http, $document) {
 			$scope.initPositionStats = function() {
@@ -253,7 +254,12 @@
 					method: "GET",
 					url: backendInsertUrlFormat.format(symbol, entryDate, entryPrice, exitDate, exitPrice)
 				}).then(function successCallback(response) {
-					console.log(response);
+					var code = response['data'];
+					if (code == '0') {
+						alert("Trade saved to database.");
+					} else {
+						alert("Error: " + response);
+					}
 				});
 			};
 
