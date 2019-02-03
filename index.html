@@ -77,7 +77,7 @@
 					}
 				});
 
-				$scope.requestTradesEntries();
+				$scope.requestTradingLog();
 
 				if (runRender) {
 					$scope.setDates($scope.toDate);
@@ -257,8 +257,8 @@
 				});
 			};
 
-			// request entries from the database
-			$scope.requestTradesEntries = function() {
+			// request trading log entries from the database
+			$scope.requestTradingLog = function() {
 				$http({
 					method: "GET",
 					url: backendEntriesUrl,
@@ -266,12 +266,12 @@
 						'Content-Type': 'text/html'
 					}
 				}).then(function successCallback(response) {
-					$scope.tradesEntriesTable = response.data;
+					$scope.tradingLogTable = response.data;
 				});
-				$scope.tradesEntriesTable = "loading ...";
+				$scope.tradingLogTable = "loading ...";
 			};
 
-			$scope.tradesEntriesRowClick = function(row) {
+			$scope.tradingLogRowClick = function(row) {
 				$scope.symbol = row.symbol;
 				$scope.entryDate = row.entry_date;
 				$scope.entry = row.entry_price;
@@ -313,7 +313,7 @@
 					<a data-toggle="tab" href="#tab1-id">School</a>
 				</li>
 				<li>
-					<a data-toggle="tab" href="#tab2-id">Trades entries</a>
+					<a data-toggle="tab" href="#tab2-id">Trading log</a>
 				</li>
 			</ul>
 
@@ -429,9 +429,9 @@
 						</thead>
 
 						<tbody>
-							<tr ng-repeat="row in tradesEntriesTable"
+							<tr ng-repeat="row in tradingLogTable"
 								ng-class="row.exit_price >= row.entry_price ? 'success' : 'danger'"
-								ng-click="tradesEntriesRowClick(row)"
+								ng-click="tradingLogRowClick(row)"
 								style="cursor: pointer">
 
 								<td>{{ row.symbol }}</td>
