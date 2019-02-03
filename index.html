@@ -267,6 +267,24 @@
 				$scope.tradesEntriesTable = "loading ...";
 			};
 
+			$scope.tradesEntriesRowClick = function(row) {
+				$scope.symbol = row.symbol;
+				$scope.entryDate = row.entry_date;
+				$scope.entry = row.entry_price;
+				$scope.exitDate = row.exit_date;
+				$scope.exit = row.exit_price;
+				$scope.toDate = row.exit_date;
+
+				$scope.selectTab('tab1-id');
+
+				$scope.setDates($scope.toDate);
+				$scope.render();
+			};
+
+			$scope.selectTab = function(tabId) {
+				$('.nav-tabs a[href="#' + tabId + '"]').tab('show');
+			}
+
 			$scope.onPositionCollapsible = function() {
 				$scope.positionCollapsible = !$scope.positionCollapsible;
 
@@ -405,13 +423,18 @@
 						</thead>
 
 						<tbody>
-							<tr ng-repeat="item in tradesEntriesTable" ng-class="item.exit_price >= item.entry_price ? 'success' : 'danger'">
-								<td>{{ item.symbol }}</td>
-								<td>{{ item.created_date }}</td>
-								<td>{{ item.entry_date }}</td>
-								<td>{{ item.entry_price }}</td>
-								<td>{{ item.exit_date }}</td>
-								<td>{{ item.exit_price }}</td>
+							<tr ng-repeat="row in tradesEntriesTable"
+								ng-class="row.exit_price >= row.entry_price ? 'success' : 'danger'"
+								ng-click="tradesEntriesRowClick(row)"
+								style="cursor: pointer">
+
+								<td>{{ row.symbol }}</td>
+								<td>{{ row.created_date }}</td>
+								<td>{{ row.entry_date }}</td>
+								<td>{{ row.entry_price }}</td>
+								<td>{{ row.exit_date }}</td>
+								<td>{{ row.exit_price }}</td>
+
 							</tr>
 						</tbody>
 					</table>
