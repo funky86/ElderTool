@@ -185,6 +185,10 @@
 			$scope.copyToDate = function(attribute) {
 				$scope[attribute] = $scope.toDate;
 			};
+			// copy into exit value of provided scope's attribute
+			$scope.copyIntoExit = function(attribute) {
+				$scope.exit = $scope[attribute];
+			}
 			// do some calculations based on simulate fields (e.g. stop and target percentage, ratio)
 			$scope.simulateFieldsKeyPress = function() {
 				var entry = parseFloat($scope.entry);
@@ -396,6 +400,8 @@
 							<label for="exit">Exit:</label>
 							<input type="text" class="form-control" id="exit" ng-model="exit" />
 
+							<button type="button" class="btn btn-danger" ng-click="copyIntoExit('stop')" data-toggle="tooltip" title="Copy Stop">+</button>
+							<button type="button" class="btn btn-success" ng-click="copyIntoExit('target')" data-toggle="tooltip" title="Copy Target">+</button>
 							<button type="button" class="btn btn-info" ng-click="saveTrade()">Save</button>
 						</form>
 					</div>
