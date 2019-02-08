@@ -310,6 +310,19 @@
 				return utils.round((exit - entry) / entry * 100.0, 2);
 			};
 
+			// set target or stop price based on win-lose ratio
+			$scope.setRatio = function(ratio, field) {
+				if (field == 'target') {
+					$scope.target = parseFloat($scope.entry) + ($scope.entry - $scope.stop) * ratio;
+					$scope.target = utils.round($scope.target, 2);
+				} else if (field == 'stop') {
+					$scope.stop = parseFloat($scope.entry) - ($scope.target - $scope.entry) / ratio;
+					$scope.stop = utils.round($scope.stop, 2);
+				}
+
+				$scope.simulateFieldsKeyPress();
+			};
+
 			$scope.init();
 		}]);
 	</script>
@@ -394,9 +407,11 @@
 
 							<label for="stop">Stop:</label>
 							<input type="text" class="form-control" id="stop" ng-model="stop" ng-change="simulateFieldsKeyPress()" />
+							<button type="button" class="btn btn-info" ng-click="setRatio(2, 'stop')" data-toggle="tooltip" title="2x ratio from Target">2x</button>
 
 							<label for="target">Target:</label>
 							<input type="text" class="form-control" id="target" ng-model="target" ng-change="simulateFieldsKeyPress()" />
+							<button type="button" class="btn btn-info" ng-click="setRatio(2, 'target')" data-toggle="tooltip" title="2x ratio from Stop">2x</button>
 						</form>
 
 						<form class="form-inline">
