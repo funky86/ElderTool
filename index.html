@@ -305,6 +305,11 @@
 				}
 			};
 
+			// calculate gain in percentage based on entry and exit price
+			$scope.calculateGain = function(entry, exit) {
+				return utils.round((exit - entry) / entry * 100.0, 2);
+			};
+
 			$scope.init();
 		}]);
 	</script>
@@ -432,6 +437,7 @@
 								<th>Entry price</th>
 								<th>Exit date</th>
 								<th>Exit price</th>
+								<th>Gain [%]</th>
 							</tr>
 						</thead>
 
@@ -448,6 +454,7 @@
 								<td>{{ row.entry_price }}</td>
 								<td>{{ row.exit_date }}</td>
 								<td>{{ row.exit_price }}</td>
+								<td>{{ calculateGain(row.entry_price, row.exit_price) }}</td>
 
 							</tr>
 						</tbody>
