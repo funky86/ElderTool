@@ -255,7 +255,11 @@
 					url: backendInsertUrlFormat.format(symbol, entryDate, entryPrice, exitDate, exitPrice)
 				}).then(function successCallback(response) {
 					var code = response['data'];
+					
 					if (code == '0') {
+						// refresh Trading Log table
+						$scope.requestTradingLog();
+
 						alert("Trade saved to database.");
 					} else {
 						alert("Error: " + response);
