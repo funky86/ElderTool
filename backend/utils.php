@@ -41,11 +41,11 @@ function getMySQLConnection() {
 	$password = $GLOBALS['password'];
 	$database = $GLOBALS['database'];
 
-	$conn = mysqli_connect($serverName, $username, $password, $database);
+	$conn = new mysqli($serverName, $username, $password, $database);
 
-	if (!$conn) {
+	if ($conn->connect_error) {
 		echo "Could not connect.";
-	    die(mysqli_connect_error());
+	    die($conn->connect_error);
 	}
 	
 	return $conn;

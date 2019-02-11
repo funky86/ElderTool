@@ -21,12 +21,12 @@ $conn = getDatabaseConnection();
 
 $query = "INSERT INTO trades (symbol, created_date, entry_date, entry_price, exit_date, exit_price) VALUES ('$symbol', '$created_date', '$entry_date', $entry_price, '$exit_date', $exit_price)";
 
-if (mysqli_query($conn, $query)) {
+if ($conn->query($query) === TRUE) {
 	echo '0';
 } else {
 	echo '-2';
 }
 
-mysqli_close($conn);
+$conn->close();
 
 ?>
