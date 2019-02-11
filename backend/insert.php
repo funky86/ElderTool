@@ -19,14 +19,19 @@ $created_date = date('Y-m-d H:i:s');
 
 $conn = getDatabaseConnection();
 
-$query = "INSERT INTO trades (symbol, created_date, entry_date, entry_price, exit_date, exit_price) VALUES ('$symbol', '$created_date', '$entry_date', $entry_price, '$exit_date', $exit_price)";
+$query = "INSERT INTO trades (symbol, created_date, entry_date, entry_price, exit_date, exit_price) VALUES (?, ?, ?, ?, ?, ?)";
 
-if ($conn->query($query) === TRUE) {
+$stmt = $conn->prepare($query);
+
+$stmt->bind_param("sssdsd", $symbol, $created_date, $entry_date, $entry_price, $exit_date, $exit_price);
+
+if ($stmt->execute()) {
 	echo '0';
 } else {
 	echo '-2';
 }
 
+$stmt->close();
 $conn->close();
 
 ?>
