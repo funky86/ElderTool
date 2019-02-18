@@ -7,11 +7,9 @@ header("Access-Control-Allow-Origin: *");
 require('config.php');
 
 function getDatabaseConnection() {
-	$serverType = $GLOBALS['server_type'];
-
-	if ($serverType == 'MSSQL') {
+	if (DB_SERVER_TYPE == 'MSSQL') {
 		return getMSSQLConnection();
-	} else if ($serverType == 'MySQL') {
+	} else if (DB_SERVER_TYPE == 'MySQL') {
 		return getMySQLConnection();
 	} else {
 		return null;
@@ -19,13 +17,8 @@ function getDatabaseConnection() {
 }
 
 function getMSSQLConnection() {
-	$serverName = $GLOBALS['server_name'];
-	$username = $GLOBALS['username'];
-	$password = $GLOBALS['password'];
-	$database = $GLOBALS['database'];
-
-	$options = array("UID" => $username, "PWD" => $password, "Database" => $database, 'ReturnDatesAsStrings' => true);
-	$conn = sqlsrv_connect($serverName, $options);
+	$options = array("UID" => DB_USERNAME, "PWD" => DB_PASSWORD, "Database" => DB_DATABASE, 'ReturnDatesAsStrings' => true);
+	$conn = sqlsrv_connect(DB_SERVER_NAME, $options);
 
 	if ($conn === false) {
 		echo "Could not connect.";
@@ -36,12 +29,7 @@ function getMSSQLConnection() {
 }
 
 function getMySQLConnection() {
-	$serverName = $GLOBALS['server_name'];
-	$username = $GLOBALS['username'];
-	$password = $GLOBALS['password'];
-	$database = $GLOBALS['database'];
-
-	$conn = new mysqli($serverName, $username, $password, $database);
+	$conn = new mysqli(DB_SERVER_NAME, DB_USERNAME, DB_PASSWORD, DB_DATABASE);
 
 	if ($conn->connect_error) {
 		echo "Could not connect.";

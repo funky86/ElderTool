@@ -1,12 +1,12 @@
 <?php
 
-// Contains global variables for e.g. database connection attributes.
+// Contains constants for e.g. database connection attributes.
 
-$GLOBALS['server_type'] = 'MySQL'; // supported value: MySQL, MSSQL
+define('DB_SERVER_TYPE', 'MySQL'); // supported value: MySQL, MSSQL
 
-$GLOBALS['server_name'] = "localhost";
-$GLOBALS['username'] = "root";
-$GLOBALS['password'] = "m0j4HUDAbaza";
-$GLOBALS['database'] = "tradeschool";
+define('DB_SERVER_NAME', 'localhost');
+define('DB_USERNAME', 'root');
+define('DB_PASSWORD', 'm0j4HUDAbaza');
+define('DB_DATABASE', 'tradeschool');
 
 ?>
