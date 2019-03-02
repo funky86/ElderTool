@@ -134,6 +134,16 @@
 				$scope.render();
 			};
 
+			$scope.randomSymbolToday = function() {
+				// symbol
+				var array = data.symbols_1M;
+				var randIdx = utils.getRandomInt(array.length);
+				$scope.symbol = array[randIdx];
+
+				// render
+				$scope.render();
+			};
+
 			$scope.moveForDays = function(day) {
 				$scope.weeklyFromDate = utils.getAddedDaysStr($scope.weeklyFromDate, day);
 				$scope.dailyFromDate = utils.getAddedDaysStr($scope.dailyFromDate, day);
@@ -357,6 +367,7 @@
 
 						<button type="button" class="btn btn-info" ng-click="today()">Today</button>
 						<button type="button" class="btn btn-info" ng-click="randomSymbolAndFriday()">Random Friday</button>
+						<button type="button" class="btn btn-info" ng-click="randomSymbolToday()">Random Stock Today</button>
 
 						<button type="button" class="btn btn-default" ng-click="moveForDays(-1)">-1D</button>
 						<button type="button" class="btn btn-default" ng-click="moveForDays(+1)">+1D</button>
