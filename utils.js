@@ -18,6 +18,10 @@ var utils = {
     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
   },
 
+  clamp: function(num, min, max) {
+    return num <= min ? min : num >= max ? max : num;
+  },
+
 	dateToStr: function(date) {
 		return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
 	},
@@ -60,4 +64,5 @@ var utils = {
   getRandomIntMinMax: function(min, max) {
     return min + Math.floor(Math.random() * (max - min));
   }
+
 };

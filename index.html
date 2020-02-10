@@ -19,7 +19,7 @@
 	<script>
 		// HTTP request URLs
 		var weeklyChartUrlFormat = "http://c.stockcharts.com/c-sc/sc?s={0}&p=W&st={1}&en={2}&i=p8977698314c";
-		var dailyChartUrlFormat = "http://c.stockcharts.com/c-sc/sc?s={0}&p=D&st={1}&en={2}&i=p1632261458c";
+		var dailyChartUrlFormat = "http://c.stockcharts.com/c-sc/sc?s={0}&p=D&st={1}&en={2}&i=p88973124515";
 		var backend = "http://localhost:8888/TradeSchool/backend/";
 		var backendInsertUrlFormat = backend + "insert.php?symbol={0}&entry_date={1}&entry_price={2}&exit_date={3}&exit_price={4}";
 		var backendEntriesUrl = backend + "entries.php";
@@ -39,6 +39,87 @@
 				$scope.dailyChartUrl = '';
 				$scope.positionCollapsible = true;
 				$scope.onPositionCollapsible();
+
+				$scope.stocksList = {
+					allData: data.symbols_1M,
+					viewData: [],
+
+					indicesPerPage: 15,
+					currentSelectedIndex: -1,
+					currentIndicesPage: 1,
+
+					onLeftClick: function() {
+						this.moveSelection(true);
+					},
+
+					onRightClick: function() {
+						this.moveSelection(false);
+					},
+
+					onSymbolClick: function(num) {
+						var index = this.currentSelectedIndex;
+
+						$("#stocksListId li").eq(index).removeClass("active");
+
+						index = num;
+
+						$("#stocksListId li").eq(index).addClass("active");
+
+						this.currentSelectedIndex = index;
+					},
+
+					moveSelection: function(left) {
+						var index = this.currentSelectedIndex;
+						var currentPage = this.currentIndicesPage;
+
+						if (index == -1) {
+							index = 0;
+						} else {
+							$("#stocksListId li").eq(index).removeClass("active");
+
+							index += left ? -1 : 1;
+
+							if (left) { // move left
+								if (index < 0) { // overflow
+									if (currentPage > 1) {
+										currentPage--;
+										index = this.viewData.length - 1;
+									} else {
+										index = 0;
+									}
+								}
+							} else { // move right
+								if (index >= this.viewData.length) { // overflow
+									if (currentPage < this.indicesPagesCount) {
+										currentPage++;
+										index = 0;
+									} else {
+										index = this.viewData.length - 1;
+									}
+								}
+							}
+						}
+
+						this.currentSelectedIndex = index;
+						this.currentIndicesPage = currentPage;
+
+						var start = (currentPage - 1) * this.indicesPerPage;
+						var itemsCount = this.indicesPerPage;
+						if (currentPage == this.indicesPagesCount) {
+							itemsCount = this.allData.length - start;
+						}
+
+						this.viewData = this.allData.slice(start, start + itemsCount);
+
+						$("#stocksListId li").eq(index).addClass("active");
+					},
+
+					init: function() {
+						this.indicesPagesCount = Math.ceil(this.allData.length / this.indicesPerPage),
+						this.viewData = this.allData.slice(0, this.indicesPerPage);
+					}
+				};
+				$scope.stocksList.init();
 
 				$scope.initPositionStats();
 
@@ -101,6 +182,11 @@
 			$scope.today = function() {
 				var todayStr = utils.dateToStr(new Date());
 				$scope.setDates(todayStr);
+				$scope.render();
+			};
+
+			$scope.setToday = function() {
+				$scope.setDates($scope.toDate);
 				$scope.render();
 			};
 
@@ -393,6 +479,8 @@
 						<input type="text" class="form-control" id="toDate" ng-model="toDate" ng-keypress="fieldKeyPress($event)" />
 
 						<strong>{{ dayName }}</strong>
+
+						<button type="button" class="btn btn-info" ng-click="setToday()">Set Today</button>
 					</form>
 
 					<hr />
@@ -451,6 +539,27 @@
 
 					<img src="{{ weeklyChartUrl }}" />
 					<img src="{{ dailyChartUrl }}" />
+
+					<!-- Section-Start: Stocks List -->
+					<div>
+						<button class="btn btn-info"
+							 ng-click="stocksList.onLeftClick()"><</button>
+
+						<button class="btn btn-info"
+							 ng-click="stocksList.onRightClick()">></button>
+
+						<p>Page: {{ stocksList.currentIndicesPage }} / {{ stocksList.indicesPagesCount }}</p>
+
+						<ul class="pagination"
+							   id="stocksListId">
+
+							<li ng-repeat="symbol in stocksList.viewData">
+								<a href="#" ng-click="stocksList.onSymbolClick($index)">{{ symbol }}</a>
+							</li>
+
+						</ul>
+					</div>
+					<!-- Section-End: Stocks List -->
 
 				</div>
 
